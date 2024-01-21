@@ -1,6 +1,8 @@
 package com.sky.service.impl;
 
 import com.fasterxml.jackson.databind.ser.Serializers;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
@@ -100,7 +102,54 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
-        return null;
+        // select * from employee limit 10,20
+        // 基于PageHelper插件实现动态分页查询
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+        // 使用了ThreadLocal来从PageHelper中获取Page对象
+        Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
+        long total = page.getTotal();
+        List<Employee> employeeList = page.getResult();
+        return new PageResult(total, employeeList);
+    }
+
+    @Override
+    public void startOrStop(Long id, Integer status) {
+        // 构建一个不可变的员工对象
+        Employee employee = Employee.builder()
+                                    .id(id)
+                                    .status(status)
+                                    .build();
+        // 只将修改的部分更新到数据库，其他部分不更新，不能全都是null
+        employeeMapper.update(employee);
+    }
+
+    /**
+     * 根据id查询员工
+     * @param id
+     * @return
+     */
+    @Override
+    public Employee getById(Long id) {
+        Employee employee = employeeMapper.getById(id);
+        employee.setPassword("****");
+        return employee;
+    }
+
+    /**
+     * 修改员工信息
+     * @param employeeDTO
+     */
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        // 设置修改时间和修改人
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        // 更新到数据库
+        employeeMapper.update(employee);
     }
 
 }
