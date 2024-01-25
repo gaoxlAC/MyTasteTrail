@@ -83,14 +83,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 设置员工状态
         employee.setStatus(StatusConstant.ENABLE);
 
-        // 创建时间和修改时间
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-
-        // 创建人和修改人
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
-
         // 保存到数据库
         employeeMapper.insert(employee);
     }
@@ -112,6 +104,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new PageResult(total, employeeList);
     }
 
+    /**
+     * 启用或禁用员工
+     * @param id
+     * @param status
+     */
     @Override
     public void startOrStop(Long id, Integer status) {
         // 构建一个不可变的员工对象
@@ -143,10 +140,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void update(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
-
-        // 设置修改时间和修改人
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
 
         // 更新到数据库
         employeeMapper.update(employee);
