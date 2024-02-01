@@ -6,10 +6,10 @@
 <!--useGeneratedKeys:true 表示获取主键值
     keyProperty="id" 表示将主键值赋给id属性  -->
     <insert id="insertBatch">
-        insert into dish_flavor (dish_id,flavor_id)
+        insert into dish_flavor (dish_id)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.dishId},#{item.flavorId})
+            (#{item.dishId})
         </foreach>
     </insert>
 </mapper>

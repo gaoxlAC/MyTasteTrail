@@ -11,6 +11,8 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface DishMapper {
 
@@ -51,5 +53,25 @@ public interface DishMapper {
     @Delete("delete from dish where id = #{id}")
     void deleteById(Long id);
 
+    /**
+     * 更新菜品
+     * @param dish
+     */
+    @AutoFill(OperationType.UPDATE)
     void update(Dish dish);
+
+    /**
+     * 根据分类id查询菜品
+     * @param dish
+     * @return
+     */
+    List<Dish> list(Dish dish);
+
+    /**
+     * 根据菜品id获取对应的起禁售状态
+     * @param dishId
+     * @return
+     */
+    @Select("select status from dish where id = #{dishId}")
+    Integer getDishStatusById(Long dishId);
 }

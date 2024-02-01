@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import ch.qos.logback.classic.Logger;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
@@ -136,4 +137,62 @@ public class DishServiceImpl implements DishService {
             }
         }
     }
+
+    /**
+     * 根据id查询菜品
+     * @param id
+     * @return
+     */
+    @Override
+    public DishVO getByIdWithFlavor(Long id) {
+        // 获取菜品
+        Dish dish = dishMapper.getById(id);
+
+        // 查询相关菜品口味
+        List<DishFlavor> dishFlavors = dishFlavorMapper.getByDishId(id);
+
+        // 封装数据VO
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish,dishVO);
+        dishVO.setFlavors(dishFlavors);
+        return dishVO;
+    }
+
+    /**
+     * 更新菜品，入库多个表
+     * @param dishDTO
+     */
+    @Override
+    @Transactional
+    public void updateWithFlavor(DishDTO dishDTO) {
+        // 更新菜品
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO,dish);
+        dishMapper.update(dish);
+
+        // 更新菜品口味
+        List<DishFlavor> dishFlavors = dishDTO.getFlavors();
+        Long dishId = dish.getId();
+
+        // 先删除
+        dishFlavorMapper.deleteByDishId(dishId);
+        // 再新增
+        if(dishFlavors != null && dishFlavors.size() > 0){
+            dishFlavors.forEach(dishFlavor -> {
+                dishFlavor.setDishId(dishId);
+            });
+            System.out.println("新增口味："+dishFlavors);
+            dishFlavorMapper.insertBatch(dishFlavors);
+        }
+    }
+
+    @Override
+    public List<Dish> list(Long categoryId) {
+        Dish dish = Dish.builder()
+                        .categoryId(categoryId)
+                        .status(StatusConstant.ENABLE)
+                        .build();
+        return dishMapper.list(dish);
+    }
+
 }
