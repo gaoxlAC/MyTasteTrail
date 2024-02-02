@@ -12,3 +12,7 @@ sky:
     access-key-id: LTAI5tJ7mfSbAqvG6TMxqKfK
     access-key-secret: I3mtBBw07wF6OgCi2J8Af0N9UWDYQC
     bucket-name: picturestore-gaoxl
+
+  redis:
+    host: localhost
+    port: 6379
