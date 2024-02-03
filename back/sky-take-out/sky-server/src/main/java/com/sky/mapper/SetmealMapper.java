@@ -66,4 +66,11 @@ public interface SetmealMapper {
      */
     @Delete("delete from setmeal where id = #{id}")
     void deleteById(Long id);
+
+    /**
+     * 查询套餐
+     * @param setmeal
+     * @return
+     */
+    List<Setmeal> list(Setmeal setmeal);
 }
