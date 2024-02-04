@@ -21,12 +21,14 @@ import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @Author：xlg
@@ -44,6 +46,9 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 新增菜品
      * @param dishDTO
@@ -68,8 +73,17 @@ public class DishServiceImpl implements DishService {
             // 批量插入
             dishFlavorMapper.insertBatch(dishFlavors);
         }
+
+        // 清楚该分类下的菜品缓存
+        String key = "dish_" + dish.getCategoryId();
+        redisTemplate.delete(key);
     }
 
+    /**
+     * 菜品分页查询
+     * @param dishPageQueryDTO
+     * @return
+     */
     @Override
     public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
         // 分页查询
@@ -105,6 +119,10 @@ public class DishServiceImpl implements DishService {
         //删除口味中的数据
         dishFlavorMapper.deleteByDishId(id);
         });
+
+        // 清楚该分类下的菜品缓存
+        String key = "dish_*";
+        cleanCache(key);
     }
 
     /**
@@ -136,6 +154,10 @@ public class DishServiceImpl implements DishService {
                 }
             }
         }
+
+        // 清楚该分类下的菜品缓存
+        String key = "dish_*";
+        cleanCache(key);
     }
 
     /**
@@ -184,8 +206,17 @@ public class DishServiceImpl implements DishService {
             System.out.println("新增口味："+dishFlavors);
             dishFlavorMapper.insertBatch(dishFlavors);
         }
+
+        // 清楚该分类下的菜品缓存
+        String key = "dish_*";
+        cleanCache(key);
     }
 
+    /**
+     * 根据分类id查询菜品列表
+     * @param categoryId
+     * @return
+     */
     @Override
     public List<Dish> list(Long categoryId) {
         Dish dish = Dish.builder()
@@ -219,5 +250,16 @@ public class DishServiceImpl implements DishService {
         }
 
         return dishVOList;
+    }
+
+    /**
+     * 清除所有key的缓存
+     * @param pattern
+     */
+    private void cleanCache(String pattern){
+        Set<String> keys = redisTemplate.keys(pattern);
+        if(keys != null && keys.size() > 0){
+            redisTemplate.delete(keys);
+        }
     }
 }

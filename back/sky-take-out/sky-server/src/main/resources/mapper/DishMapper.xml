@@ -7,9 +7,9 @@
     keyProperty="id" 表示将主键值赋给id属性  -->
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        insert into dish (name,price,description,category_id,create_time,update_time)
+        insert into dish (name,price,image,description,category_id,create_time,update_time)
         values
-        (#{name},#{price},#{description},#{categoryId},#{createTime},#{updateTime})
+        (#{name},#{price},#{image},#{description},#{categoryId},#{createTime},#{updateTime})
     </insert>
     <update id="update">
         update dish

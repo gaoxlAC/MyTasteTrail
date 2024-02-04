@@ -24,7 +24,7 @@ public class RedisConfiguration {
         // 设置key的序列化方式
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         // 设置value的序列化方式
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+//        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return redisTemplate;
     }
 }
