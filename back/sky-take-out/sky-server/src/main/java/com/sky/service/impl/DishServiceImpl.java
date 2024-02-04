@@ -202,6 +202,8 @@ public class DishServiceImpl implements DishService {
         if(dishFlavors != null && dishFlavors.size() > 0){
             dishFlavors.forEach(dishFlavor -> {
                 dishFlavor.setDishId(dishId);
+                dishFlavor.setName(dishFlavor.getName());
+                dishFlavor.setValue(dishFlavor.getValue());
             });
             System.out.println("新增口味："+dishFlavors);
             dishFlavorMapper.insertBatch(dishFlavors);
